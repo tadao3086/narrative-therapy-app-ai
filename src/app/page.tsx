@@ -25,6 +25,8 @@ const QUESTIONS = [
       { value: "failure", label: "失敗して笑われること" },
       { value: "rejection", label: "本当の自分を出して拒絶されること" },
       { value: "trust", label: "誰かを信じて裏切られること" },
+      { value: "worthless", label: "誰の役にも立てず、無価値だと思われること" },
+      { value: "abandoned", label: "大切な人に置いていかれ、孤独になること" },
       { value: "custom", label: "その他（自由に入力）" }
     ]
   },
@@ -37,6 +39,8 @@ const QUESTIONS = [
       { value: "perfection", label: "完璧なふりをして隙を見せない" },
       { value: "cynical", label: "冷めたふりをして何にも期待しない" },
       { value: "clown", label: "道化を演じて本音をごまかす" },
+      { value: "devoted", label: "自分の欲求を抑え込み、ひたすら他人に尽くす" },
+      { value: "aggressive", label: "傷つけられる前に、攻撃的な態度で威嚇する" },
       { value: "custom", label: "その他（自由に入力）" }
     ]
   },
@@ -104,6 +108,12 @@ export default function Home() {
     }
   };
 
+  const handlePrevQuestion = () => {
+    if (currentQuestionIdx > 0) {
+      setCurrentQuestionIdx(prev => prev - 1);
+    }
+  };
+
   const generateStory = async () => {
     setAppState("loading");
     setErrorMsg("");
@@ -112,12 +122,16 @@ export default function Home() {
       const fear = answers.fear === "custom" ? answers.fear_custom || "漠然とした不安" :
                    answers.fear === "failure" ? "失敗して笑われること" :
                    answers.fear === "rejection" ? "本当の自分を出して拒絶されること" :
-                   answers.fear === "trust" ? "誰かを信じて裏切られること" : answers.fear;
+                   answers.fear === "trust" ? "誰かを信じて裏切られること" :
+                   answers.fear === "worthless" ? "誰の役にも立てず、無価値だと思われること" :
+                   answers.fear === "abandoned" ? "大切な人に置いていかれ、孤独になること" : answers.fear;
                    
       const facade = answers.facade === "custom" ? answers.facade_custom || "自分を偽る態度" :
                      answers.facade === "perfection" ? "完璧なふりをして隙を見せない" :
                      answers.facade === "cynical" ? "冷めたふりをして何にも期待しない" :
-                     answers.facade === "clown" ? "道化を演じて本音をごまかす" : answers.facade;
+                     answers.facade === "clown" ? "道化を演じて本音をごまかす" :
+                     answers.facade === "devoted" ? "自分の欲求を抑え込み、ひたすら他人に尽くす" :
+                     answers.facade === "aggressive" ? "傷つけられる前に、攻撃的な態度で威嚇する" : answers.facade;
                      
       const keyword = answers.keyword || "特になし";
 
@@ -331,6 +345,16 @@ export default function Home() {
             )}
 
             <div className={styles.actionRow}>
+              <div className={styles.secondaryActionGroup}>
+                <button className={styles.topButton} onClick={handleReset}>
+                  TOPへ戻る
+                </button>
+                {currentQuestionIdx > 0 && (
+                  <button className={styles.backButton} onClick={handlePrevQuestion}>
+                    戻る
+                  </button>
+                )}
+              </div>
               <button 
                 className={styles.nextButton}
                 onClick={handleNextQuestion}
