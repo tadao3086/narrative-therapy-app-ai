@@ -282,6 +282,12 @@ export default function Home() {
               {QUESTIONS[currentQuestionIdx].text}
             </h2>
             
+            {errorMsg && (
+              <div style={{ padding: "0.5rem", marginBottom: "1rem", backgroundColor: "rgba(239, 68, 68, 0.1)", border: "1px solid #ef4444", borderRadius: "0.5rem" }}>
+                <p style={{ color: "#ef4444", fontSize: "0.9rem", margin: 0 }}>{errorMsg}</p>
+              </div>
+            )}
+            
             {QUESTIONS[currentQuestionIdx].type === "select" ? (
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <select 
