@@ -25,6 +25,7 @@ const QUESTIONS = [
       { value: "failure", label: "失敗して笑われること" },
       { value: "rejection", label: "本当の自分を出して拒絶されること" },
       { value: "trust", label: "誰かを信じて裏切られること" },
+      { value: "custom", label: "その他（自由に入力）" }
     ]
   },
   {
@@ -36,6 +37,7 @@ const QUESTIONS = [
       { value: "perfection", label: "完璧なふりをして隙を見せない" },
       { value: "cynical", label: "冷めたふりをして何にも期待しない" },
       { value: "clown", label: "道化を演じて本音をごまかす" },
+      { value: "custom", label: "その他（自由に入力）" }
     ]
   },
   {
@@ -107,11 +109,13 @@ export default function Home() {
     setErrorMsg("");
 
     try {
-      const fear = answers.fear === "failure" ? "失敗して笑われること" :
+      const fear = answers.fear === "custom" ? answers.fear_custom || "漠然とした不安" :
+                   answers.fear === "failure" ? "失敗して笑われること" :
                    answers.fear === "rejection" ? "本当の自分を出して拒絶されること" :
                    answers.fear === "trust" ? "誰かを信じて裏切られること" : answers.fear;
                    
-      const facade = answers.facade === "perfection" ? "完璧なふりをして隙を見せない" :
+      const facade = answers.facade === "custom" ? answers.facade_custom || "自分を偽る態度" :
+                     answers.facade === "perfection" ? "完璧なふりをして隙を見せない" :
                      answers.facade === "cynical" ? "冷めたふりをして何にも期待しない" :
                      answers.facade === "clown" ? "道化を演じて本音をごまかす" : answers.facade;
                      
@@ -208,6 +212,10 @@ export default function Home() {
   const isCurrentAnswerValid = () => {
     const q = QUESTIONS[currentQuestionIdx];
     const ans = answers[q.id];
+    if (ans === "custom") {
+      const customAns = answers[q.id + "_custom"];
+      return customAns !== undefined && customAns.trim() !== "";
+    }
     return ans !== undefined && ans.trim() !== "";
   };
 
@@ -275,15 +283,32 @@ export default function Home() {
             </h2>
             
             {QUESTIONS[currentQuestionIdx].type === "select" ? (
-              <select 
-                className={styles.selectInput}
-                value={answers[QUESTIONS[currentQuestionIdx].id] || ""}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-              >
-                {QUESTIONS[currentQuestionIdx].options?.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <select 
+                  className={styles.selectInput}
+                  value={answers[QUESTIONS[currentQuestionIdx].id] || ""}
+                  onChange={(e) => handleAnswerChange(e.target.value)}
+                >
+                  {QUESTIONS[currentQuestionIdx].options?.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                {answers[QUESTIONS[currentQuestionIdx].id] === "custom" && (
+                  <input
+                    type="text"
+                    className={`${styles.textInput} animate-fade-in`}
+                    placeholder="自由に入力してください"
+                    value={answers[QUESTIONS[currentQuestionIdx].id + "_custom"] || ""}
+                    onChange={(e) => setAnswers(prev => ({ ...prev, [QUESTIONS[currentQuestionIdx].id + "_custom"]: e.target.value }))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && isCurrentAnswerValid()) {
+                        handleNextQuestion();
+                      }
+                    }}
+                    autoFocus
+                  />
+                )}
+              </div>
             ) : (
               <input 
                 type="text"
